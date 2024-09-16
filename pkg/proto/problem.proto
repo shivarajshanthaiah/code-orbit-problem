@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./";
+
+service ProblemService{
+    rpc InsertProblem(Problem) returns(ProblemResponse);
+}
+
+message Problem{
+    string Title = 1;
+    string Discription = 2;
+    string Difficulty = 3;
+    string Tags = 4;
+}
+
+message ProblemResponse {
+    enum Status {
+        OK = 0;
+        ERROR = 1;
+    }
+
+    Status status = 1;
+    string message = 2;
+    oneof payload {
+        string error = 3;
+        string data = 4;
+    }
+}
