@@ -23,6 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProblemServiceClient interface {
 	InsertProblem(ctx context.Context, in *Problem, opts ...grpc.CallOption) (*ProblemResponse, error)
+	GetAllProblems(ctx context.Context, in *ProbNoParam, opts ...grpc.CallOption) (*ProblemList, error)
+	InsertTestCases(ctx context.Context, in *TestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
+	UpdateTestCases(ctx context.Context, in *UpdateTestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 }
 
 type problemServiceClient struct {
@@ -42,11 +45,41 @@ func (c *problemServiceClient) InsertProblem(ctx context.Context, in *Problem, o
 	return out, nil
 }
 
+func (c *problemServiceClient) GetAllProblems(ctx context.Context, in *ProbNoParam, opts ...grpc.CallOption) (*ProblemList, error) {
+	out := new(ProblemList)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/GetAllProblems", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *problemServiceClient) InsertTestCases(ctx context.Context, in *TestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error) {
+	out := new(ProblemResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/InsertTestCases", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *problemServiceClient) UpdateTestCases(ctx context.Context, in *UpdateTestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error) {
+	out := new(ProblemResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/UpdateTestCases", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProblemServiceServer is the server API for ProblemService service.
 // All implementations must embed UnimplementedProblemServiceServer
 // for forward compatibility
 type ProblemServiceServer interface {
 	InsertProblem(context.Context, *Problem) (*ProblemResponse, error)
+	GetAllProblems(context.Context, *ProbNoParam) (*ProblemList, error)
+	InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error)
+	UpdateTestCases(context.Context, *UpdateTestCaseRequest) (*ProblemResponse, error)
 	mustEmbedUnimplementedProblemServiceServer()
 }
 
@@ -56,6 +89,15 @@ type UnimplementedProblemServiceServer struct {
 
 func (UnimplementedProblemServiceServer) InsertProblem(context.Context, *Problem) (*ProblemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertProblem not implemented")
+}
+func (UnimplementedProblemServiceServer) GetAllProblems(context.Context, *ProbNoParam) (*ProblemList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllProblems not implemented")
+}
+func (UnimplementedProblemServiceServer) InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertTestCases not implemented")
+}
+func (UnimplementedProblemServiceServer) UpdateTestCases(context.Context, *UpdateTestCaseRequest) (*ProblemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTestCases not implemented")
 }
 func (UnimplementedProblemServiceServer) mustEmbedUnimplementedProblemServiceServer() {}
 
@@ -88,6 +130,60 @@ func _ProblemService_InsertProblem_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProblemService_GetAllProblems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProbNoParam)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).GetAllProblems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/GetAllProblems",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).GetAllProblems(ctx, req.(*ProbNoParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProblemService_InsertTestCases_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TestCaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).InsertTestCases(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/InsertTestCases",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).InsertTestCases(ctx, req.(*TestCaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProblemService_UpdateTestCases_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTestCaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).UpdateTestCases(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/UpdateTestCases",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).UpdateTestCases(ctx, req.(*UpdateTestCaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProblemService_ServiceDesc is the grpc.ServiceDesc for ProblemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +194,18 @@ var ProblemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InsertProblem",
 			Handler:    _ProblemService_InsertProblem_Handler,
+		},
+		{
+			MethodName: "GetAllProblems",
+			Handler:    _ProblemService_GetAllProblems_Handler,
+		},
+		{
+			MethodName: "InsertTestCases",
+			Handler:    _ProblemService_InsertTestCases_Handler,
+		},
+		{
+			MethodName: "UpdateTestCases",
+			Handler:    _ProblemService_UpdateTestCases_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

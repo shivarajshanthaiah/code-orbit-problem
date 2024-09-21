@@ -16,3 +16,11 @@ func (p *ProblemRepository) FindProblemByID(ProblemID uint) (*model.Problem, err
 	}
 	return &Problem, nil
 }
+
+func (p *ProblemRepository) GetAllProblems() (*[]model.Problem, error) {
+	var problems []model.Problem
+	if err := p.DB.Find(&problems).Error; err != nil {
+		return nil, err
+	}
+	return &problems, nil
+}

@@ -6,11 +6,13 @@ import (
 )
 
 type ProblemService struct {
-	Repo interRepo.ProblemRepoInter
+	Repo         interRepo.ProblemRepoInter
+	TestCaseRepo interRepo.MongoRepoInter
 }
 
-func NewProblemService(repo interRepo.ProblemRepoInter) interfaces.ProblemServiceInter {
+func NewProblemService(repo interRepo.ProblemRepoInter, testRepo interRepo.MongoRepoInter) interfaces.ProblemServiceInter {
 	return &ProblemService{
-		Repo: repo,
+		Repo:         repo,
+		TestCaseRepo: testRepo,
 	}
 }

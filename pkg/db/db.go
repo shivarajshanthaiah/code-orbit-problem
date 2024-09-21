@@ -36,3 +36,5 @@ func ConnectDB(config *config.Config) *gorm.DB {
 	}
 	return DB
 }
+
+

@@ -10,6 +10,8 @@ type Config struct {
 	Port     string `mapstructure:"PORT"`
 	Sslmode  string `mapstructure:"SSL"`
 	GrpcPort string `mapstructure:"GRPCPORT"`
+	DBUrl    string `mapstructure:"MONGODB_URL"`
+	DBName   string `mapstructure:"MONGODB_NAME"`
 	// UserPort  string `mapstructure:"GRPCUSERPORT"`
 	// AdminPort  string `mapstructure:"GRPCADMINPORT"`
 	// APIKey    string `mapstructure:"RAZORPAY_KEY_ID"`

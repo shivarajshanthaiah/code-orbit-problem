@@ -8,7 +8,7 @@ type Submission struct {
 	UserID       string `gorm:"not null"`
 	ProblemID    int    `gorm:"not null"`
 	Language     string
-	Code         string
+	Code         string `gorm:"type:text"`
 	Status       string
 	AttemptCount int
 }

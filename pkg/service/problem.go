@@ -12,6 +12,7 @@ func (pr *ProblemService) InsertProblemService(p *pb.Problem) (*pb.ProblemRespon
 		Description: p.Discription,
 		Difficulty:  p.Difficulty,
 		Tags:        p.Tags,
+		IsPremium:   p.Is_Premium,
 	}
 
 	err := pr.Repo.InsertProblem(&problem)
@@ -29,4 +30,31 @@ func (pr *ProblemService) InsertProblemService(p *pb.Problem) (*pb.ProblemRespon
 		Status:  pb.ProblemResponse_OK,
 		Message: "Problem created succesfully",
 	}, nil
+}
+
+func (pr *ProblemService) FindAllProblemsService(p *pb.ProbNoParam) (*pb.ProblemList, error) {
+	result, err := pr.Repo.GetAllProblems()
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if result is nil
+	if result == nil {
+		return &pb.ProblemList{}, nil
+	}
+
+	var problemList pb.ProblemList
+	for _, problem := range *result {
+		pbProblem := &pb.Problem{
+			ID:          uint32(problem.ID),
+			Title:       problem.Title,
+			Discription: problem.Description,
+			Difficulty:  problem.Difficulty,
+			Tags:        problem.Tags,
+			Is_Premium:  problem.IsPremium,
+		}
+		problemList.Problems = append(problemList.Problems, pbProblem)
+	}
+
+	return &problemList, nil
 }

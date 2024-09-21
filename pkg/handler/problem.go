@@ -13,3 +13,11 @@ func (pr *ProblemHandler) InsertProblem(ctx context.Context, p *pb.Problem) (*pb
 	}
 	return reponse, nil
 }
+
+func (pr *ProblemHandler) GetAllProblems(ctx context.Context, p *pb.ProbNoParam) (*pb.ProblemList, error) {
+	response, err := pr.SVC.FindAllProblemsService(p)
+	if err != nil {
+		return response, nil
+	}
+	return response, nil
+}
