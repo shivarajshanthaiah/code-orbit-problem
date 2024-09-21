@@ -35,7 +35,7 @@ func (pr *ProblemService) InsertTestCasesService(ctx context.Context, req *pb.Te
 
 	return &pb.ProblemResponse{
 		Status:  pb.ProblemResponse_OK,
-		Message: "testcased created succesfully",
+		Message: "testcases created succesfully",
 		Payload: &pb.ProblemResponse_Data{
 			Data: testCaseID, // Return the test case ID in the response
 		},

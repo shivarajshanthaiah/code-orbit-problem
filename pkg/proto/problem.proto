@@ -10,6 +10,26 @@ service ProblemService{
 
     rpc InsertTestCases(TestCaseRequest) returns(ProblemResponse);
     rpc UpdateTestCases(UpdateTestCaseRequest) returns (ProblemResponse);
+    rpc GetProblemWithTestCases(ProblemId) returns (GetProblemResponse);
+}
+
+message ProblemWithTestCases {
+    Problem problem = 1;
+    repeated TestCase test_cases = 2;
+}
+
+message GetProblemResponse {
+    enum Status {
+        OK = 0;
+        ERROR = 1;
+    }
+
+    Status status = 1;
+    string message = 2;
+    oneof payload {
+        string error = 3;
+        ProblemWithTestCases data = 4;
+    }
 }
 
 message UpdateTestCaseRequest {
@@ -18,9 +38,15 @@ message UpdateTestCaseRequest {
     repeated TestCase test_cases = 3;
 }
 
+// message TestCase{
+//     string input = 1;
+//     string expected_output = 2;
+// }
+
 message TestCase{
-    string input = 1;
-    string expected_output = 2;
+string test_case_id = 1;
+string input = 2;
+string expected_output = 3;
 }
 
 message TestCaseRequest {
@@ -40,6 +66,10 @@ message TestCaseResponse {
         string error = 3;
         string data = 4;
     }
+}
+
+message ProblemId {
+    int32 ID = 1;
 }
 
 message ProbNoParam{}

@@ -21,3 +21,12 @@ func (pr *ProblemHandler) GetAllProblems(ctx context.Context, p *pb.ProbNoParam)
 	}
 	return response, nil
 }
+
+
+func (ph *ProblemHandler) GetProblemWithTestCases(ctx context.Context, p *pb.ProblemId) (*pb.GetProblemResponse, error) {
+    response, err := ph.SVC.GetProblemWithTestCasesService(ctx, p)
+    if err != nil {
+        return response, err
+    }
+    return response, nil
+}

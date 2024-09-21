@@ -36,3 +36,14 @@ func (r *MongoRepository) UpdateTestCases(ctx context.Context, testCaseID string
 	_, err = r.Collection.UpdateOne(ctx, filter, update)
 	return err
 }
+
+func (r *MongoRepository) GetTestCasesByProblemID(problemID int32) (*model.TestCasesDocument, error) {
+	var testCasesDoc model.TestCasesDocument
+	filter := bson.M{"problem_id": problemID}
+	err := r.Collection.FindOne(context.Background(), filter).Decode(&testCasesDoc)
+	if err != nil {
+		return nil, err
+	}
+
+	return &testCasesDoc, nil
+}
