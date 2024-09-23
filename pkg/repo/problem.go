@@ -35,3 +35,26 @@ func (p *ProblemRepository) GetProblemByID(problemID int32) (*model.Problem, err
 
     return &problem, nil
 }
+
+func (p *ProblemRepository) UpdateProblem(problem *model.Problem) error{
+	if err := p.DB.Save(&problem).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+// func (p *ProblemRepository) UpdateProblem(problem *model.Problem) error {
+// 	updates := map[string]interface{}{
+// 		"Title":       problem.Title,
+// 		"Description": problem.Description,
+// 		"Difficulty":  problem.Difficulty,
+// 		"Tags":        problem.Tags,
+// 		"IsPremium":   problem.IsPremium, // Explicitly include IsPremium
+// 	}
+
+// 	if err := p.DB.Model(&problem).Updates(updates).Error; err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
+

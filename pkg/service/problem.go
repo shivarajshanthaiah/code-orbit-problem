@@ -14,7 +14,7 @@ func (pr *ProblemService) InsertProblemService(p *pb.Problem) (*pb.ProblemRespon
 		Description: p.Discription,
 		Difficulty:  p.Difficulty,
 		Tags:        p.Tags,
-		IsPremium:   p.Is_Premium,
+		IsPremium:   p.IsPremium,
 	}
 
 	err := pr.Repo.InsertProblem(&problem)
@@ -53,7 +53,7 @@ func (pr *ProblemService) FindAllProblemsService(p *pb.ProbNoParam) (*pb.Problem
 			Discription: problem.Description,
 			Difficulty:  problem.Difficulty,
 			Tags:        problem.Tags,
-			Is_Premium:  problem.IsPremium,
+			IsPremium:   problem.IsPremium,
 		}
 		problemList.Problems = append(problemList.Problems, pbProblem)
 	}
@@ -61,111 +61,92 @@ func (pr *ProblemService) FindAllProblemsService(p *pb.ProbNoParam) (*pb.Problem
 	return &problemList, nil
 }
 
-// func (pr *ProblemService) GetProblemWithTestCasesService(ctx context.Context, req *pb.ProblemId) (*pb.GetProblemResponse, error) {
-// 	// Fetch the problem from PostgreSQL
-// 	problem, err := pr.Repo.GetProblemByID(req.ID)
-// 	if err != nil {
-// 		return &pb.GetProblemResponse{
-// 			Status:  pb.GetProblemResponse_ERROR,
-// 			Message: "Error fetching problem",
-// 			Payload: &pb.GetProblemResponse_Error{
-// 				Error: err.Error(),
-// 			},
-// 		}, err
-// 	}
-
-// 	// Fetch the test cases from MongoDB
-// 	testCases, err := pr.TestCaseRepo.GetTestCasesByProblemID(req.ID)
-// 	if err != nil {
-// 		return &pb.GetProblemResponse{
-// 			Status:  pb.GetProblemResponse_ERROR,
-// 			Message: "Error fetching test cases",
-// 			Payload: &pb.GetProblemResponse_Error{
-// 				Error: err.Error(),
-// 			},
-// 		}, err
-// 	}
-
-// 	// Convert the problem and test cases into the response format
-// 	var grpcTestCases []*pb.TestCase
-// 	for _, tc := range testCases {
-// 		grpcTestCases = append(grpcTestCases, &pb.TestCase{
-// 			Input:          tc.Input,
-// 			ExpectedOutput: tc.ExpectedOutput,
-// 			TestCaseId:     tc.ObjectID.Hex(), // Include MongoDB ObjectID
-// 		})
-// 	}
-
-// 	return &pb.GetProblemResponse{
-// 		Status:  pb.GetProblemResponse_OK,
-// 		Message: "Problem and test cases fetched successfully",
-// 		Payload: &pb.GetProblemResponse_Data{
-// 			Data: &pb.ProblemWithTestCases{
-// 				Problem: &pb.Problem{
-// 					ID:          uint32(problem.ID), // Include Problem ID
-// 					Title:       problem.Title,
-// 					Discription: problem.Description,
-// 					Difficulty:  problem.Difficulty,
-// 					Tags:        problem.Tags,
-// 					Is_Premium:  problem.IsPremium,
-// 				},
-// 				TestCases: grpcTestCases,
-// 			},
-// 		},
-// 	}, nil
-// }
-
 func (pr *ProblemService) GetProblemWithTestCasesService(ctx context.Context, req *pb.ProblemId) (*pb.GetProblemResponse, error) {
-    // Fetch the problem from PostgreSQL
-    problem, err := pr.Repo.GetProblemByID(req.ID)
-    if err != nil {
-        return &pb.GetProblemResponse{
-            Status:  pb.GetProblemResponse_ERROR,
-            Message: "Error fetching problem",
-            Payload: &pb.GetProblemResponse_Error{
-                Error: err.Error(),
-            },
-        }, err
-    }
+	// Fetch the problem from PostgreSQL
+	problem, err := pr.Repo.GetProblemByID(req.ID)
+	if err != nil {
+		return &pb.GetProblemResponse{
+			Status:  pb.GetProblemResponse_ERROR,
+			Message: "Error fetching problem",
+			Payload: &pb.GetProblemResponse_Error{
+				Error: err.Error(),
+			},
+		}, err
+	}
 
-    // Fetch the test cases from MongoDB
-    testCasesDoc, err := pr.TestCaseRepo.GetTestCasesByProblemID(req.ID)
-    if err != nil {
-        return &pb.GetProblemResponse{
-            Status:  pb.GetProblemResponse_ERROR,
-            Message: "Error fetching test cases",
-            Payload: &pb.GetProblemResponse_Error{
-                Error: err.Error(),
-            },
-        }, err
-    }
+	// Fetch the test cases from MongoDB
+	testCasesDoc, err := pr.TestCaseRepo.GetTestCasesByProblemID(req.ID)
+	if err != nil {
+		return &pb.GetProblemResponse{
+			Status:  pb.GetProblemResponse_ERROR,
+			Message: "Error fetching test cases",
+			Payload: &pb.GetProblemResponse_Error{
+				Error: err.Error(),
+			},
+		}, err
+	}
 
-    // Convert the problem and test cases into the response format
-    var grpcTestCases []*pb.TestCase
-    for _, tc := range testCasesDoc.TestCases { // Now this should work
-        grpcTestCases = append(grpcTestCases, &pb.TestCase{
-            TestCaseId:     tc.ID, // Assuming this is the field for MongoDB ObjectID
-            Input:          tc.Input,
-            ExpectedOutput: tc.ExpectedOutput,
-        })
-    }
+	// Convert the problem and test cases into the response format
+	var grpcTestCases []*pb.TestCase
+	for _, tc := range testCasesDoc.TestCases { // Now this should work
+		grpcTestCases = append(grpcTestCases, &pb.TestCase{
+			TestCaseId:     tc.ID, // Assuming this is the field for MongoDB ObjectID
+			Input:          tc.Input,
+			ExpectedOutput: tc.ExpectedOutput,
+		})
+	}
 
-    return &pb.GetProblemResponse{
-        Status:  pb.GetProblemResponse_OK,
-        Message: "Problem and test cases fetched successfully",
-        Payload: &pb.GetProblemResponse_Data{
-            Data: &pb.ProblemWithTestCases{
-                Problem: &pb.Problem{
-                    ID:          uint32(problem.ID), // Include Problem ID
-                    Title:       problem.Title,
-                    Discription: problem.Description,
-                    Difficulty:  problem.Difficulty,
-                    Tags:        problem.Tags,
-                    Is_Premium:  problem.IsPremium,
-                },
-                TestCases: grpcTestCases,
-            },
-        },
-    }, nil
+	return &pb.GetProblemResponse{
+		Status:  pb.GetProblemResponse_OK,
+		Message: "Problem and test cases fetched successfully",
+		Payload: &pb.GetProblemResponse_Data{
+			Data: &pb.ProblemWithTestCases{
+				Problem: &pb.Problem{
+					ID:          uint32(problem.ID),
+					Title:       problem.Title,
+					Discription: problem.Description,
+					Difficulty:  problem.Difficulty,
+					Tags:        problem.Tags,
+					IsPremium:   problem.IsPremium,
+				},
+				TestCases: grpcTestCases,
+			},
+		},
+	}, nil
 }
 
+func (pr *ProblemService) EditProblemService(p *pb.Problem) (*pb.Problem, error) {
+	problem, err := pr.Repo.FindProblemByID(uint(p.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	problem.Title = p.Title
+	problem.Description = p.Discription
+	problem.Difficulty = p.Difficulty
+	problem.Tags = p.Tags
+	problem.IsPremium = p.IsPremium
+
+	err = pr.Repo.UpdateProblem(problem)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
+func (pr *ProblemService) FindProblemByIDService(p *pb.ProblemId) (*pb.Problem, error) {
+	problem, err := pr.Repo.FindProblemByID(uint(p.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Problem{
+		ID:          uint32(problem.ID),
+		Title:       problem.Title,
+		Discription: problem.Description,
+		Difficulty:  problem.Difficulty,
+		Tags:        problem.Difficulty,
+		IsPremium:   problem.IsPremium,
+	}, nil
+}

@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ProblemServiceClient interface {
 	InsertProblem(ctx context.Context, in *Problem, opts ...grpc.CallOption) (*ProblemResponse, error)
 	GetAllProblems(ctx context.Context, in *ProbNoParam, opts ...grpc.CallOption) (*ProblemList, error)
+	FindProblemByID(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*Problem, error)
+	EditProblem(ctx context.Context, in *Problem, opts ...grpc.CallOption) (*Problem, error)
 	InsertTestCases(ctx context.Context, in *TestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 	UpdateTestCases(ctx context.Context, in *UpdateTestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 	GetProblemWithTestCases(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*GetProblemResponse, error)
@@ -49,6 +51,24 @@ func (c *problemServiceClient) InsertProblem(ctx context.Context, in *Problem, o
 func (c *problemServiceClient) GetAllProblems(ctx context.Context, in *ProbNoParam, opts ...grpc.CallOption) (*ProblemList, error) {
 	out := new(ProblemList)
 	err := c.cc.Invoke(ctx, "/pb.ProblemService/GetAllProblems", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *problemServiceClient) FindProblemByID(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*Problem, error) {
+	out := new(Problem)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/FindProblemByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *problemServiceClient) EditProblem(ctx context.Context, in *Problem, opts ...grpc.CallOption) (*Problem, error) {
+	out := new(Problem)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/EditProblem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +108,8 @@ func (c *problemServiceClient) GetProblemWithTestCases(ctx context.Context, in *
 type ProblemServiceServer interface {
 	InsertProblem(context.Context, *Problem) (*ProblemResponse, error)
 	GetAllProblems(context.Context, *ProbNoParam) (*ProblemList, error)
+	FindProblemByID(context.Context, *ProblemId) (*Problem, error)
+	EditProblem(context.Context, *Problem) (*Problem, error)
 	InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error)
 	UpdateTestCases(context.Context, *UpdateTestCaseRequest) (*ProblemResponse, error)
 	GetProblemWithTestCases(context.Context, *ProblemId) (*GetProblemResponse, error)
@@ -103,6 +125,12 @@ func (UnimplementedProblemServiceServer) InsertProblem(context.Context, *Problem
 }
 func (UnimplementedProblemServiceServer) GetAllProblems(context.Context, *ProbNoParam) (*ProblemList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllProblems not implemented")
+}
+func (UnimplementedProblemServiceServer) FindProblemByID(context.Context, *ProblemId) (*Problem, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindProblemByID not implemented")
+}
+func (UnimplementedProblemServiceServer) EditProblem(context.Context, *Problem) (*Problem, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditProblem not implemented")
 }
 func (UnimplementedProblemServiceServer) InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertTestCases not implemented")
@@ -158,6 +186,42 @@ func _ProblemService_GetAllProblems_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProblemServiceServer).GetAllProblems(ctx, req.(*ProbNoParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProblemService_FindProblemByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProblemId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).FindProblemByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/FindProblemByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).FindProblemByID(ctx, req.(*ProblemId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProblemService_EditProblem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Problem)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).EditProblem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/EditProblem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).EditProblem(ctx, req.(*Problem))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -230,6 +294,14 @@ var ProblemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllProblems",
 			Handler:    _ProblemService_GetAllProblems_Handler,
+		},
+		{
+			MethodName: "FindProblemByID",
+			Handler:    _ProblemService_FindProblemByID_Handler,
+		},
+		{
+			MethodName: "EditProblem",
+			Handler:    _ProblemService_EditProblem_Handler,
 		},
 		{
 			MethodName: "InsertTestCases",

@@ -9,6 +9,8 @@ import (
 type ProblemServiceInter interface {
 	InsertProblemService(p *pb.Problem) (*pb.ProblemResponse, error)
 	FindAllProblemsService(p *pb.ProbNoParam) (*pb.ProblemList, error)
+	EditProblemService(p *pb.Problem) (*pb.Problem, error)
+	FindProblemByIDService(p *pb.ProblemId) (*pb.Problem, error)
 
 	InsertTestCasesService(ctx context.Context, req *pb.TestCaseRequest) (*pb.ProblemResponse, error)
 	UpdateTestCasesService(ctx context.Context, req *pb.UpdateTestCaseRequest) (*pb.ProblemResponse, error)

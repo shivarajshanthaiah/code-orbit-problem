@@ -7,6 +7,8 @@ option go_package = "./";
 service ProblemService{
     rpc InsertProblem(Problem) returns(ProblemResponse);
     rpc GetAllProblems(ProbNoParam) returns(ProblemList);
+    rpc FindProblemByID(ProblemId) returns(Problem);
+    rpc EditProblem(Problem) returns(Problem);
 
     rpc InsertTestCases(TestCaseRequest) returns(ProblemResponse);
     rpc UpdateTestCases(UpdateTestCaseRequest) returns (ProblemResponse);
@@ -84,7 +86,7 @@ message Problem{
     string Discription = 3;
     string Difficulty = 4;
     string Tags = 5;
-    bool Is_Premium = 6;
+    bool IsPremium = 6;
 }
 
 message ProblemResponse {
