@@ -10,7 +10,7 @@ type ProblemRepoInter interface {
 	InsertProblem(Problem *model.Problem) error
 	FindProblemByID(ProblemID uint) (*model.Problem, error)
 	GetAllProblems() (*[]model.Problem, error)
-	GetProblemByID(problemID int32) (*model.Problem, error)
+	GetProblemByID(problemID uint) (*model.Problem, error)
 	UpdateProblem(problem *model.Problem) error
 }
 

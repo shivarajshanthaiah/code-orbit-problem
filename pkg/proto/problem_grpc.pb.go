@@ -26,6 +26,7 @@ type ProblemServiceClient interface {
 	GetAllProblems(ctx context.Context, in *ProbNoParam, opts ...grpc.CallOption) (*ProblemList, error)
 	FindProblemByID(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*Problem, error)
 	EditProblem(ctx context.Context, in *Problem, opts ...grpc.CallOption) (*Problem, error)
+	AdminUpgradeProbem(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*ProblemResponse, error)
 	InsertTestCases(ctx context.Context, in *TestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 	UpdateTestCases(ctx context.Context, in *UpdateTestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 	GetProblemWithTestCases(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*GetProblemResponse, error)
@@ -75,6 +76,15 @@ func (c *problemServiceClient) EditProblem(ctx context.Context, in *Problem, opt
 	return out, nil
 }
 
+func (c *problemServiceClient) AdminUpgradeProbem(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*ProblemResponse, error) {
+	out := new(ProblemResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/AdminUpgradeProbem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *problemServiceClient) InsertTestCases(ctx context.Context, in *TestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error) {
 	out := new(ProblemResponse)
 	err := c.cc.Invoke(ctx, "/pb.ProblemService/InsertTestCases", in, out, opts...)
@@ -110,6 +120,7 @@ type ProblemServiceServer interface {
 	GetAllProblems(context.Context, *ProbNoParam) (*ProblemList, error)
 	FindProblemByID(context.Context, *ProblemId) (*Problem, error)
 	EditProblem(context.Context, *Problem) (*Problem, error)
+	AdminUpgradeProbem(context.Context, *ProblemId) (*ProblemResponse, error)
 	InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error)
 	UpdateTestCases(context.Context, *UpdateTestCaseRequest) (*ProblemResponse, error)
 	GetProblemWithTestCases(context.Context, *ProblemId) (*GetProblemResponse, error)
@@ -131,6 +142,9 @@ func (UnimplementedProblemServiceServer) FindProblemByID(context.Context, *Probl
 }
 func (UnimplementedProblemServiceServer) EditProblem(context.Context, *Problem) (*Problem, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditProblem not implemented")
+}
+func (UnimplementedProblemServiceServer) AdminUpgradeProbem(context.Context, *ProblemId) (*ProblemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUpgradeProbem not implemented")
 }
 func (UnimplementedProblemServiceServer) InsertTestCases(context.Context, *TestCaseRequest) (*ProblemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertTestCases not implemented")
@@ -226,6 +240,24 @@ func _ProblemService_EditProblem_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProblemService_AdminUpgradeProbem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProblemId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).AdminUpgradeProbem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/AdminUpgradeProbem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).AdminUpgradeProbem(ctx, req.(*ProblemId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ProblemService_InsertTestCases_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestCaseRequest)
 	if err := dec(in); err != nil {
@@ -302,6 +334,10 @@ var ProblemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EditProblem",
 			Handler:    _ProblemService_EditProblem_Handler,
+		},
+		{
+			MethodName: "AdminUpgradeProbem",
+			Handler:    _ProblemService_AdminUpgradeProbem_Handler,
 		},
 		{
 			MethodName: "InsertTestCases",

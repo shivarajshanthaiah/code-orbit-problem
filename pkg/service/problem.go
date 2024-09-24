@@ -63,7 +63,7 @@ func (pr *ProblemService) FindAllProblemsService(p *pb.ProbNoParam) (*pb.Problem
 
 func (pr *ProblemService) GetProblemWithTestCasesService(ctx context.Context, req *pb.ProblemId) (*pb.GetProblemResponse, error) {
 	// Fetch the problem from PostgreSQL
-	problem, err := pr.Repo.GetProblemByID(req.ID)
+	problem, err := pr.Repo.GetProblemByID(uint(req.ID))
 	if err != nil {
 		return &pb.GetProblemResponse{
 			Status:  pb.GetProblemResponse_ERROR,
@@ -149,4 +149,35 @@ func (pr *ProblemService) FindProblemByIDService(p *pb.ProblemId) (*pb.Problem, 
 		Tags:        problem.Difficulty,
 		IsPremium:   problem.IsPremium,
 	}, nil
+}
+
+func (pr *ProblemService) UpgradeProblemService(p *pb.ProblemId) (*pb.ProblemResponse, error){
+	problem, err := pr.Repo.GetProblemByID(uint(p.ID))
+	if err != nil {
+		return &pb.ProblemResponse{
+			Status:  pb.ProblemResponse_ERROR,
+			Message: "error in getting problem from database",
+			Payload: &pb.ProblemResponse_Error{
+				Error: err.Error(),
+			},
+		}, err
+	}
+
+	problem.IsPremium = true
+	err = pr.Repo.UpdateProblem(problem)
+	if err != nil {
+		return &pb.ProblemResponse{
+			Status:  pb.ProblemResponse_ERROR,
+			Message: "error in upgrading problem in database",
+			Payload: &pb.ProblemResponse_Error{
+				Error: err.Error(),
+			},
+		}, err
+	}
+
+	return &pb.ProblemResponse{
+		Status:  pb.ProblemResponse_OK,
+		Message: "Problem upgraded successfully",
+	}, nil
+
 }

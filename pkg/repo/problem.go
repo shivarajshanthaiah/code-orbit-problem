@@ -25,7 +25,7 @@ func (p *ProblemRepository) GetAllProblems() (*[]model.Problem, error) {
 	return &problems, nil
 }
 
-func (p *ProblemRepository) GetProblemByID(problemID int32) (*model.Problem, error) {
+func (p *ProblemRepository) GetProblemByID(problemID uint) (*model.Problem, error) {
     var problem model.Problem
 
     err := p.DB.Where("id = ?", problemID).First(&problem).Error

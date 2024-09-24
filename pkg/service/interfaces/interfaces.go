@@ -11,6 +11,7 @@ type ProblemServiceInter interface {
 	FindAllProblemsService(p *pb.ProbNoParam) (*pb.ProblemList, error)
 	EditProblemService(p *pb.Problem) (*pb.Problem, error)
 	FindProblemByIDService(p *pb.ProblemId) (*pb.Problem, error)
+	UpgradeProblemService(p *pb.ProblemId) (*pb.ProblemResponse, error)
 
 	InsertTestCasesService(ctx context.Context, req *pb.TestCaseRequest) (*pb.ProblemResponse, error)
 	UpdateTestCasesService(ctx context.Context, req *pb.UpdateTestCaseRequest) (*pb.ProblemResponse, error)

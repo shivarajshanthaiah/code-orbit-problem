@@ -45,3 +45,11 @@ func (ph *ProblemHandler) EditProblem(ctx context.Context, p *pb.Problem) (*pb.P
 	}
 	return response, nil
 }
+
+func (ph *ProblemHandler) AdminUpgradeProbem(ctx context.Context, p *pb.ProblemId) (*pb.ProblemResponse, error) {
+	response, err := ph.SVC.UpgradeProblemService(p)
+	if err != nil {
+		return response, err
+	}
+	return response, nil
+}
