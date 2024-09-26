@@ -13,7 +13,7 @@ func (pr *ProblemService) InsertProblemService(p *pb.Problem) (*pb.ProblemRespon
 		Title:       p.Title,
 		Description: p.Discription,
 		Difficulty:  p.Difficulty,
-		Tags:        p.Tags,
+		Type:        p.Type,
 		IsPremium:   p.IsPremium,
 	}
 
@@ -52,7 +52,7 @@ func (pr *ProblemService) FindAllProblemsService(p *pb.ProbNoParam) (*pb.Problem
 			Title:       problem.Title,
 			Discription: problem.Description,
 			Difficulty:  problem.Difficulty,
-			Tags:        problem.Tags,
+			Type:        problem.Type,
 			IsPremium:   problem.IsPremium,
 		}
 		problemList.Problems = append(problemList.Problems, pbProblem)
@@ -106,7 +106,7 @@ func (pr *ProblemService) GetProblemWithTestCasesService(ctx context.Context, re
 					Title:       problem.Title,
 					Discription: problem.Description,
 					Difficulty:  problem.Difficulty,
-					Tags:        problem.Tags,
+					Type:        problem.Type,
 					IsPremium:   problem.IsPremium,
 				},
 				TestCases: grpcTestCases,
@@ -124,7 +124,7 @@ func (pr *ProblemService) EditProblemService(p *pb.Problem) (*pb.Problem, error)
 	problem.Title = p.Title
 	problem.Description = p.Discription
 	problem.Difficulty = p.Difficulty
-	problem.Tags = p.Tags
+	problem.Type = p.Type
 	problem.IsPremium = p.IsPremium
 
 	err = pr.Repo.UpdateProblem(problem)
@@ -146,7 +146,7 @@ func (pr *ProblemService) FindProblemByIDService(p *pb.ProblemId) (*pb.Problem, 
 		Title:       problem.Title,
 		Discription: problem.Description,
 		Difficulty:  problem.Difficulty,
-		Tags:        problem.Difficulty,
+		Type:        problem.Type,
 		IsPremium:   problem.IsPremium,
 	}, nil
 }

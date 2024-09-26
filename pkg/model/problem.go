@@ -8,6 +8,6 @@ type Problem struct {
 	Title       string `gorm:"not null;size:255"`
 	Description string `gorm:"type:text"`
 	Difficulty  string
-	Tags        string
+	Type        string
 	IsPremium   bool `gorm:"default:false"`
 }

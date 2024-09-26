@@ -12,6 +12,10 @@ type ProblemRepoInter interface {
 	GetAllProblems() (*[]model.Problem, error)
 	GetProblemByID(problemID uint) (*model.Problem, error)
 	UpdateProblem(problem *model.Problem) error
+
+	SaveSubmission(submission *model.Submission) error
+	FetchSubmission(userID string, problemID int) (*model.Submission, error)
+	UpdateSubmission(userID string, problemID int, status string) error
 }
 
 type MongoRepoInter interface {

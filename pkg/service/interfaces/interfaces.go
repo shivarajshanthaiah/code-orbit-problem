@@ -16,4 +16,6 @@ type ProblemServiceInter interface {
 	InsertTestCasesService(ctx context.Context, req *pb.TestCaseRequest) (*pb.ProblemResponse, error)
 	UpdateTestCasesService(ctx context.Context, req *pb.UpdateTestCaseRequest) (*pb.ProblemResponse, error)
 	GetProblemWithTestCasesService(ctx context.Context, req *pb.ProblemId) (*pb.GetProblemResponse, error)
+
+	SubmitCodeService(ctx context.Context, req *pb.SubmissionRequest) (*pb.SubmissionResponse, error)
 }
