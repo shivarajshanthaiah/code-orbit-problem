@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"strings"
+	"sync"
 
 	"github.com/shivaraj-shanthaiah/code_orbit_problem/pkg/model"
 	pb "github.com/shivaraj-shanthaiah/code_orbit_problem/pkg/proto"
@@ -32,32 +33,48 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 	log.Printf("Received code for execution: %s", req.Code)
 
 	// Step 3: Initialize counts for passed and failed test cases
-	passedCount := 0
-	failedCount := 0
+	var passedCount int32
+	var failedCount int32
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex // To safely update passedCount and failedCount
 
 	for _, testCase := range testCasesDoc.TestCases {
-		log.Printf("Executing test case with input: %s, Expected output: %s", testCase.Input, testCase.ExpectedOutput)
+		wg.Add(1)
 
-		// Execute the user's code
-		output, execErr := usercodeexcecution.RunUserCode(problem.Type, req.Code, testCase.Input)
-		if execErr != nil {
-			log.Printf("Execution failed for input: %s, Error: %v", testCase.Input, execErr)
-			failedCount++
-			continue
-		}
+		go func(testCase model.TestCase) {
+			defer wg.Done()
 
-		// Log actual output
-		log.Printf("Actual output: %s", output)
+			log.Printf("Executing test case with input: %s, Expected output: %s", testCase.Input, testCase.ExpectedOutput)
 
-		// Compare the trimmed output with the expected output
-		if strings.TrimSpace(output) == strings.TrimSpace(testCase.ExpectedOutput) {
-			passedCount++
-			log.Printf("Test case passed")
-		} else {
-			failedCount++
-			log.Printf("Test case failed: input: %s, expected: %s, actual: %s", testCase.Input, testCase.ExpectedOutput, output)
-		}
+			// Execute the user's code
+			output, execErr := usercodeexcecution.RunUserCode(problem.Type, req.Code, testCase.Input)
+			if execErr != nil {
+				log.Printf("Execution failed for input: %s, Error: %v", testCase.Input, execErr)
+				mu.Lock()
+				failedCount++
+				mu.Unlock()
+				return
+			}
+
+			log.Printf("Actual output: %s", output)
+
+			// Compare the trimmed output with the expected output
+			if strings.TrimSpace(output) == strings.TrimSpace(testCase.ExpectedOutput) {
+				mu.Lock()
+				passedCount++
+				mu.Unlock()
+				log.Printf("Test case passed")
+			} else {
+				mu.Lock()
+				failedCount++
+				mu.Unlock()
+				log.Printf("Test case failed: input: %s, expected: %s, actual: %s", testCase.Input, testCase.ExpectedOutput, output)
+			}
+		}(testCase) // Pass testCase to avoid closure issues
 	}
+
+	wg.Wait()
 
 	// Step 5: Determine if the submission passed or failed
 	status := "passed"
@@ -74,9 +91,9 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 	if err == nil {
 		// Update the existing submission with new code and status
 		submission = existingSubmission
-		submission.Code = req.Code // Update the code
-		submission.Status = status // Update the status
-		submission.AttemptCount++  // Increment the attempt count
+		submission.Code = req.Code
+		submission.Status = status
+		submission.AttemptCount++
 		err = pr.Repo.UpdateSubmission(submission)
 		if err != nil {
 			return &pb.SubmissionResponse{
@@ -108,7 +125,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 	return &pb.SubmissionResponse{
 		Status:  pb.SubmissionResponse_OK,
 		Message: message,
-		Passed:  int32(passedCount),
-		Failed:  int32(failedCount),
+		Passed:  passedCount,
+		Failed:  failedCount,
 	}, nil
 }
