@@ -9,6 +9,7 @@ import (
 	"github.com/shivaraj-shanthaiah/code_orbit_problem/pkg/model"
 	pb "github.com/shivaraj-shanthaiah/code_orbit_problem/pkg/proto"
 	usercodeexcecution "github.com/shivaraj-shanthaiah/code_orbit_problem/pkg/userCodeExcecution"
+	"github.com/shivaraj-shanthaiah/code_orbit_problem/utils"
 )
 
 func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.SubmissionRequest) (*pb.SubmissionResponse, error) {
@@ -19,6 +20,14 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 			Status:  pb.SubmissionResponse_ERROR,
 			Message: "Failed to fetch problem details",
 		}, err
+	}
+
+	compileErr := utils.CheckSyntax(req.Code)
+	if compileErr != nil {
+		return &pb.SubmissionResponse{
+			Status:  pb.SubmissionResponse_ERROR,
+			Message: "Compilation error: " + compileErr.Error(),
+		}, compileErr
 	}
 
 	// Step 2: Fetch test cases
