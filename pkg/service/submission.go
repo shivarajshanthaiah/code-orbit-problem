@@ -29,6 +29,8 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 		}, err
 	}
 
+	log.Printf("Received code for execution: %s", req.Code)
+
 	// Step 3: Initialize counts for passed and failed test cases
 	passedCount := 0
 	failedCount := 0
@@ -65,21 +67,17 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 		message = "Submission failed"
 	}
 
-	// Step 6: Save the submission and update the attempt count
-	submission := &model.Submission{
-		UserID:       req.UserId,
-		ProblemID:    int(req.ProblemId),
-		Language:     req.Language,
-		Code:         req.Code,
-		Status:       status,
-		AttemptCount: 1, // This will be incremented in the update function
-	}
-
-	// Check if there's already an existing submission for this user and problem
+	// Step 6: Check for existing submission
 	existingSubmission, err := pr.Repo.FetchSubmission(req.UserId, int(req.ProblemId))
+
+	var submission *model.Submission
 	if err == nil {
-		// Update submission if it exists
-		err = pr.Repo.UpdateSubmission(req.UserId, int(req.ProblemId), status)
+		// Update the existing submission with new code and status
+		submission = existingSubmission
+		submission.Code = req.Code // Update the code
+		submission.Status = status // Update the status
+		submission.AttemptCount++  // Increment the attempt count
+		err = pr.Repo.UpdateSubmission(submission)
 		if err != nil {
 			return &pb.SubmissionResponse{
 				Status:  pb.SubmissionResponse_ERROR,
@@ -87,7 +85,16 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 			}, err
 		}
 	} else {
-		// Save new submission if one doesn't exist
+		// Create a new submission
+		submission = &model.Submission{
+			UserID:       req.UserId,
+			ProblemID:    int(req.ProblemId),
+			Language:     req.Language,
+			Code:         req.Code,
+			Status:       status,
+			AttemptCount: 1, // First attempt
+		}
+		// Save the new submission
 		err = pr.Repo.SaveSubmission(submission)
 		if err != nil {
 			return &pb.SubmissionResponse{
@@ -97,14 +104,11 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 		}
 	}
 
-	log.Println(existingSubmission)
-
 	// Step 7: Return the submission response
 	return &pb.SubmissionResponse{
-		Status:       pb.SubmissionResponse_OK,
-		Message:      message,
-		Passed:       int32(passedCount),
-		Failed:       int32(failedCount),
-		SubmissionId: req.UserId,
+		Status:  pb.SubmissionResponse_OK,
+		Message: message,
+		Passed:  int32(passedCount),
+		Failed:  int32(failedCount),
 	}, nil
 }

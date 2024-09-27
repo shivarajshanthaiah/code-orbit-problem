@@ -19,3 +19,9 @@ func RunStringProblem(code, input string) (string, error) {
 	tempFilePath := "./pkg/userCodeExcecution/temp/submission.go"
 	return utils.ExecuteUserCode(code, input, tempFilePath)
 }
+
+func RunArrayProblem(code, input string) (string, error) {
+	log.Println("this is array")
+	tempFilePath := "./pkg/userCodeExcecution/temp/submission.go"
+	return utils.ExecuteUserCode(code, input, tempFilePath)
+}

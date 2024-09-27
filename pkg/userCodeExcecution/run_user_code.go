@@ -13,6 +13,8 @@ func RunUserCode(problemType, code, input string) (string, error) {
 		return problem.RunStringProblem(code, input)
 	case "math":
 		return problem.RunMathProblem(code, input)
+	case "array":
+		return problem.RunArrayProblem(code, input)
 	default:
 		return "", fmt.Errorf("unsupported problem type: %s", problemType)
 	}
