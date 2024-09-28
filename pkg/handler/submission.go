@@ -13,3 +13,11 @@ func (ph *ProblemHandler) SubmitCode(ctx context.Context, p *pb.SubmissionReques
 	}
 	return response, nil
 }
+
+func (ph *ProblemHandler) GetUserStats(ctx context.Context, p *pb.UserID) (*pb.StatsResponse, error) {
+	response, err := ph.SVC.GetUserStats(ctx, p)
+	if err != nil {
+		return response, err
+	}
+	return response, nil
+}

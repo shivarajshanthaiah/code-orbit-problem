@@ -16,6 +16,7 @@ type ProblemRepoInter interface {
 	SaveSubmission(submission *model.Submission) error
 	FetchSubmission(userID string, problemID int) (*model.Submission, error)
 	UpdateSubmission(submission *model.Submission) error
+	GetUserStats(userID string) (map[string]int, error)
 }
 
 type MongoRepoInter interface {

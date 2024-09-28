@@ -16,6 +16,21 @@ service ProblemService{
     rpc GetProblemWithTestCases(ProblemId) returns(GetProblemResponse);
 
     rpc SubmitCode(SubmissionRequest) returns(SubmissionResponse);
+    rpc GetUserStats(UserID) returns(StatsResponse);
+}
+
+message StatsResponse {
+    string user_id = 1;
+    int32 total_attempts = 2;
+    int32 total_successful_submissions = 3;
+    int32 total_failed_submissions = 4;
+    int32 easy_attempts = 5;
+    int32 medium_attempts = 6;
+    int32 hard_attempts = 7;
+}
+
+message UserID{
+    string ID = 1;
 }
 
 message SubmissionResponse {

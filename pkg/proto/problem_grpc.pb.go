@@ -31,6 +31,7 @@ type ProblemServiceClient interface {
 	UpdateTestCases(ctx context.Context, in *UpdateTestCaseRequest, opts ...grpc.CallOption) (*ProblemResponse, error)
 	GetProblemWithTestCases(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*GetProblemResponse, error)
 	SubmitCode(ctx context.Context, in *SubmissionRequest, opts ...grpc.CallOption) (*SubmissionResponse, error)
+	GetUserStats(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*StatsResponse, error)
 }
 
 type problemServiceClient struct {
@@ -122,6 +123,15 @@ func (c *problemServiceClient) SubmitCode(ctx context.Context, in *SubmissionReq
 	return out, nil
 }
 
+func (c *problemServiceClient) GetUserStats(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*StatsResponse, error) {
+	out := new(StatsResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/GetUserStats", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProblemServiceServer is the server API for ProblemService service.
 // All implementations must embed UnimplementedProblemServiceServer
 // for forward compatibility
@@ -135,6 +145,7 @@ type ProblemServiceServer interface {
 	UpdateTestCases(context.Context, *UpdateTestCaseRequest) (*ProblemResponse, error)
 	GetProblemWithTestCases(context.Context, *ProblemId) (*GetProblemResponse, error)
 	SubmitCode(context.Context, *SubmissionRequest) (*SubmissionResponse, error)
+	GetUserStats(context.Context, *UserID) (*StatsResponse, error)
 	mustEmbedUnimplementedProblemServiceServer()
 }
 
@@ -168,6 +179,9 @@ func (UnimplementedProblemServiceServer) GetProblemWithTestCases(context.Context
 }
 func (UnimplementedProblemServiceServer) SubmitCode(context.Context, *SubmissionRequest) (*SubmissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitCode not implemented")
+}
+func (UnimplementedProblemServiceServer) GetUserStats(context.Context, *UserID) (*StatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserStats not implemented")
 }
 func (UnimplementedProblemServiceServer) mustEmbedUnimplementedProblemServiceServer() {}
 
@@ -344,6 +358,24 @@ func _ProblemService_SubmitCode_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProblemService_GetUserStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).GetUserStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/GetUserStats",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).GetUserStats(ctx, req.(*UserID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProblemService_ServiceDesc is the grpc.ServiceDesc for ProblemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -386,6 +418,10 @@ var ProblemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitCode",
 			Handler:    _ProblemService_SubmitCode_Handler,
+		},
+		{
+			MethodName: "GetUserStats",
+			Handler:    _ProblemService_GetUserStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -22,6 +22,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 		}, err
 	}
 
+	// Step 2: Check the syntax
 	compileErr := utils.CheckSyntax(req.Code)
 	if compileErr != nil {
 		return &pb.SubmissionResponse{
@@ -30,7 +31,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 		}, compileErr
 	}
 
-	// Step 2: Fetch test cases
+	// Step 3: Fetch test cases
 	testCasesDoc, err := pr.TestCaseRepo.GetTestCasesByProblemID(req.ProblemId)
 	if err != nil {
 		return &pb.SubmissionResponse{
@@ -41,7 +42,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 
 	log.Printf("Received code for execution: %s", req.Code)
 
-	// Step 3: Initialize counts for passed and failed test cases
+	// Step 4: Initializig counts for passed and failed test cases
 	var passedCount int32
 	var failedCount int32
 
@@ -56,7 +57,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 
 			log.Printf("Executing test case with input: %s, Expected output: %s", testCase.Input, testCase.ExpectedOutput)
 
-			// Execute the user's code
+			// Executing the user's code
 			output, execErr := usercodeexcecution.RunUserCode(problem.Type, req.Code, testCase.Input)
 			if execErr != nil {
 				log.Printf("Execution failed for input: %s, Error: %v", testCase.Input, execErr)
@@ -68,7 +69,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 
 			log.Printf("Actual output: %s", output)
 
-			// Compare the trimmed output with the expected output
+			// Comparing the trimmed output with the expected output
 			if strings.TrimSpace(output) == strings.TrimSpace(testCase.ExpectedOutput) {
 				mu.Lock()
 				passedCount++
@@ -80,7 +81,7 @@ func (pr *ProblemService) SubmitCodeService(ctx context.Context, req *pb.Submiss
 				mu.Unlock()
 				log.Printf("Test case failed: input: %s, expected: %s, actual: %s", testCase.Input, testCase.ExpectedOutput, output)
 			}
-		}(testCase) // Pass testCase to avoid closure issues
+		}(testCase) // Passing testCase to avoid closure issues
 	}
 
 	wg.Wait()
