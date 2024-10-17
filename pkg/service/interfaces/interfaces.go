@@ -19,4 +19,6 @@ type ProblemServiceInter interface {
 
 	SubmitCodeService(ctx context.Context, req *pb.SubmissionRequest) (*pb.SubmissionResponse, error)
 	GetUserStats(ctx context.Context, p *pb.UserID) (*pb.StatsResponse, error)
+	GetProblemStatsService(req *pb.ProblemStatsRequest) (*pb.ProblemStatsResponse, error)
+	GetLeaderboardService() (*pb.LeaderboardResponse, error)
 }

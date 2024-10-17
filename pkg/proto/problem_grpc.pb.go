@@ -32,6 +32,8 @@ type ProblemServiceClient interface {
 	GetProblemWithTestCases(ctx context.Context, in *ProblemId, opts ...grpc.CallOption) (*GetProblemResponse, error)
 	SubmitCode(ctx context.Context, in *SubmissionRequest, opts ...grpc.CallOption) (*SubmissionResponse, error)
 	GetUserStats(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*StatsResponse, error)
+	GetProblemStats(ctx context.Context, in *ProblemStatsRequest, opts ...grpc.CallOption) (*ProblemStatsResponse, error)
+	GetLeaderboard(ctx context.Context, in *LeaderboardRequest, opts ...grpc.CallOption) (*LeaderboardResponse, error)
 }
 
 type problemServiceClient struct {
@@ -132,6 +134,24 @@ func (c *problemServiceClient) GetUserStats(ctx context.Context, in *UserID, opt
 	return out, nil
 }
 
+func (c *problemServiceClient) GetProblemStats(ctx context.Context, in *ProblemStatsRequest, opts ...grpc.CallOption) (*ProblemStatsResponse, error) {
+	out := new(ProblemStatsResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/GetProblemStats", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *problemServiceClient) GetLeaderboard(ctx context.Context, in *LeaderboardRequest, opts ...grpc.CallOption) (*LeaderboardResponse, error) {
+	out := new(LeaderboardResponse)
+	err := c.cc.Invoke(ctx, "/pb.ProblemService/GetLeaderboard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProblemServiceServer is the server API for ProblemService service.
 // All implementations must embed UnimplementedProblemServiceServer
 // for forward compatibility
@@ -146,6 +166,8 @@ type ProblemServiceServer interface {
 	GetProblemWithTestCases(context.Context, *ProblemId) (*GetProblemResponse, error)
 	SubmitCode(context.Context, *SubmissionRequest) (*SubmissionResponse, error)
 	GetUserStats(context.Context, *UserID) (*StatsResponse, error)
+	GetProblemStats(context.Context, *ProblemStatsRequest) (*ProblemStatsResponse, error)
+	GetLeaderboard(context.Context, *LeaderboardRequest) (*LeaderboardResponse, error)
 	mustEmbedUnimplementedProblemServiceServer()
 }
 
@@ -182,6 +204,12 @@ func (UnimplementedProblemServiceServer) SubmitCode(context.Context, *Submission
 }
 func (UnimplementedProblemServiceServer) GetUserStats(context.Context, *UserID) (*StatsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserStats not implemented")
+}
+func (UnimplementedProblemServiceServer) GetProblemStats(context.Context, *ProblemStatsRequest) (*ProblemStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProblemStats not implemented")
+}
+func (UnimplementedProblemServiceServer) GetLeaderboard(context.Context, *LeaderboardRequest) (*LeaderboardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLeaderboard not implemented")
 }
 func (UnimplementedProblemServiceServer) mustEmbedUnimplementedProblemServiceServer() {}
 
@@ -376,6 +404,42 @@ func _ProblemService_GetUserStats_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProblemService_GetProblemStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProblemStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).GetProblemStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/GetProblemStats",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).GetProblemStats(ctx, req.(*ProblemStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProblemService_GetLeaderboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaderboardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProblemServiceServer).GetLeaderboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.ProblemService/GetLeaderboard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProblemServiceServer).GetLeaderboard(ctx, req.(*LeaderboardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProblemService_ServiceDesc is the grpc.ServiceDesc for ProblemService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -422,6 +486,14 @@ var ProblemService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserStats",
 			Handler:    _ProblemService_GetUserStats_Handler,
+		},
+		{
+			MethodName: "GetProblemStats",
+			Handler:    _ProblemService_GetProblemStats_Handler,
+		},
+		{
+			MethodName: "GetLeaderboard",
+			Handler:    _ProblemService_GetLeaderboard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -17,6 +17,12 @@ type ProblemRepoInter interface {
 	FetchSubmission(userID string, problemID int) (*model.Submission, error)
 	UpdateSubmission(submission *model.Submission) error
 	GetUserStats(userID string) (map[string]int, error)
+
+	CountByCondition(condition string) int64
+	CountByDifficulty(difficulty string) int64
+	GetDistinctProblemTypes() ([]string, error)
+	CountByPremiumStatus(isPremium bool) int64
+	GetLeaderboard() ([]model.LeaderboardEntry, error)
 }
 
 type MongoRepoInter interface {

@@ -12,3 +12,8 @@ type Submission struct {
 	Status       string
 	AttemptCount int
 }
+
+type LeaderboardEntry struct {
+    UserID      string
+    SolvedCount int32
+}
